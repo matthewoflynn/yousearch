@@ -11,6 +11,8 @@ ini_set("display_errors", 1);
 require_once 'secrets.php';
 
 
+$current_dir = dirname(__FILE__);
+set_include_path(get_include_path() .PATH_SEPARATOR. $current_dir);
 require_once 'Zend/Loader.php';
 Zend_Loader::loadClass('Zend_Gdata_YouTube');
 Zend_Loader::loadClass('Zend_Gdata_AuthSub');
