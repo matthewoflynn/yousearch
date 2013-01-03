@@ -1,0 +1,39 @@
+Extension
+=========
+
+Description
+-----------
+Search for youtube videos using the text selected
+
+
+Name
+----
+Youtube Search
+YouSearch
+MusicSearch
+YouTube Music Search
+SelectAndSearchYouTube
+
+User Stories
+------------
+1. Search Youtube for selected text using browser action	
+2. Play Youtube video inline the search results				
+3. Open Youtube video in new tab from search results		
+4. Provide link to iTunes Store from search results			
+5. Search Youtube from popup window							
+6. Begin Youtube search from popup window					
+
+
+Backlog
+-------
+1. Create playlist from selecting a list
+2. Save playlist to user account
+
+
+
+Cases to Handle
+---------------
+0 results 	Q: abgade
+1 result   	Q: asdfasdfasdfx
+5 results	Q: 
+6 results	Q: 

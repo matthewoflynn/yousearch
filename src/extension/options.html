@@ -1,0 +1,89 @@
+<html>
+
+<head>
+<title>YouSearch Options</title>
+
+
+
+<style>
+#content {
+	display: block;
+	width: 400px;
+	margin: auto;
+}
+
+h1 {
+	float: left;
+	margin: 5px 5px 5px 15px;
+	font: 16px arial;
+}
+
+img {
+	float: left;
+}
+
+#options {
+	float: left;
+	width: 400px;
+	height: 300px;
+	border: 1px solid #F00;
+	
+	font: 14px arial;
+}
+
+
+
+</style>
+
+<script src="jquery.js"></script>
+
+<script>
+
+var options = chrome.extension.getBackgroundPage().options;
+
+function saveOptions() {
+	var searchResultsPerPage;
+	
+	searchResultsPerPage = $('option:selected').val();
+	options.saveValue("searchResultsPerPage", searchResultsPerPage);
+	
+	
+}; 
+
+$(document).ready( function() {
+	console.log("loading existing options");
+	
+	var searchResultsPerPage = options.getValueAsInt('searchResultsPerPage');
+	$("option[value='" + searchResultsPerPage + "']").attr("selected", "selected");
+} );
+
+</script>
+
+</head>
+
+<body>
+
+<div id="content">
+	<img alt="" src="img/YouSearch-Horizontal-25.png" /> <h1>Options</h1>
+	
+	<div id="options">
+		Results Per Page
+		<select id="results-per-page">
+			<option value="5">5</option>
+			<option value="10">10</option>
+		</select>
+		
+		<br />
+		
+		<input type="button" value="Save" onclick="saveOptions()">
+		
+		<br />
+		
+		<a href="yousearch-support@gmail.com">YouSearch Support</a>
+	</div>
+	
+</div>
+
+</body>
+
+</html>

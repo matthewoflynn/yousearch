@@ -1,0 +1,30 @@
+{
+	"name": "You Search",
+	"version": "0.3",
+	"description": "Create youtube playlists from highlighted text",
+	"manifest_version": 2,
+	"icons": {"128": "img/YouSearch128.png"},
+	"permissions": [
+		"tabs",
+		"http://*/*",
+		"https://*/*"
+	],
+	"browser_action": {
+		"default_icon": "img/YouSearch Icon-19.png",
+		"default_title": "Search Youtube for selected text",
+		"default_popup": "popup.html"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"http://*/*",
+				"https://*/*"
+				],
+			"js": ["context_script.js"]
+		}
+	],
+	"content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
+	"background": {
+		"scripts": ["background.js"]
+	}
+}
