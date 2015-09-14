@@ -1,8 +1,6 @@
 YouSearch
 =========
 
-temp_change
-
 Chrome extension for searching Youtube and automatically generating Youtube playlists
 
 Running Extension Locally
@@ -18,4 +16,3 @@ You'll need the following server setup or similar:
     - Apache 2.2.22+
     - PHP 5.3.15+
     
-temp_change
