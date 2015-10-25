@@ -17,5 +17,3 @@ You'll need the following server setup or similar:
     - PHP 5.3.15+
     
 
-
-tests
