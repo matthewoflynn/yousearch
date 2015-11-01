@@ -37,14 +37,20 @@ function YoutubeSearchQuery() {
 	
 	this.executeQuery = function(search_string, start_index, results_per_page) {
 		_search_string = search_string;
-		var youtubeAPIQuery = "http://gdata.youtube.com/feeds/api/videos?"
-							  + "format=5"
-							  + "&alt=json" 
-							  + "&max-results=" + results_per_page
-							  + "&start-index=" + start_index
-							  + "&q=" + search_string;		
+		var youtube = {
+			BaseApiQuery : "https://www.googleapis.com/youtube/v3",
+			ApiQuery : "/search?q=" + search_string,
+			DeveloperKey :"key=AIzaSyBYPUJZlP-QaxWaE79zEMZBvCKenWlNQws",
+			ApiPart : "part=snippet"
+		};
+
+		var fullYoutubeQuery = youtube.BaseApiQuery + 
+							   	youtube.ApiQuery  + "&" +
+								youtube.DeveloperKey  + "&" +
+								youtube.ApiPart;
+
 		
-		sendRequest(youtubeAPIQuery);
+		sendRequest(fullYoutubeQuery);
 	};
 	
 	/** Private Methods *****************************************************/
@@ -84,27 +90,26 @@ function YoutubeSearchQuery() {
 		
 		// parse results
 		var data = JSON.parse(response_text);	
-		var feed = data.feed;
 		
 		results.search_query = _search_string;
-		results.total_results = feed.openSearch$totalResults.$t;
+		results.total_results = data.pageInfo.totalResults;
 		results.entries = [];
 		
-		// loop through entries
-		var entries = feed.entry || [];
+		// loop through search results
+		var entries = data.items || [];
 		
 		for (var i = 0; i < entries.length; ++i) {
 			var entry = entries[i];
-			var video_id = entry.id.$t.substring(42);
+			var video_id = entry;
 			var result = {};
 			result = {
 						id:				video_id,
-						title: 			entry.title.$t,
-						views:			entry.yt$statistics.viewCount,
-						duration: 		entry.media$group.yt$duration.seconds,
-						link_url: 		entry.link[0]['href'],
-						thumb_url:		entry.media$group.media$thumbnail[1].url,
-						content_url: 	entry.media$group.media$content[0].url
+						title: 			entry.snippet.title.substring(42),
+						views:			5,
+						duration: 		5,
+						link_url: 		"www.google.com",
+						thumb_url:		entry.snippet.thumbnails.default.url,
+						content_url: 	"www.google.com"
 					  };
 			
 			var mins = Math.floor(result.duration / 60);
