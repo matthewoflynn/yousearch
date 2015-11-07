@@ -1,5 +1,4 @@
-module("Youtube Search Query Module");
-
+QUnit.module( "Youtube Query - Search Query Tests");
 
 QUnit.test( "Search results are valid", function( assert ) {
     assert.expect(3);
@@ -69,3 +68,6 @@ QUnit.test("Ensure only videos are retrieved", function( assert ) {
 
     query.executeQuery("School of Life", 1, 5);
 });
+
+
+
