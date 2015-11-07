@@ -47,7 +47,7 @@ function YoutubeSearchQuery() {
 			BaseApiQuery : "https://www.googleapis.com/youtube/v3",
 			ApiQuery : "/search?q=" + search_string,
 			DeveloperKey :"key=AIzaSyBYPUJZlP-QaxWaE79zEMZBvCKenWlNQws",
-			ApiPart : "part=snippet"
+			ApiPart : "part=snippet&type=video"
 		};
 
 		var fullYoutubeQuery = youtube.BaseApiQuery + 
@@ -113,7 +113,7 @@ function YoutubeSearchQuery() {
 			var result = {};
 			result = {
 						id:				video_id,
-						title: 			entry.snippet.title.substring(42),
+						title: 			entry.snippet.title.substring(0, 42),
 						views:			5,
 						duration: 		5,
 						link_url: 		"https://www.youtube.com/watch?v=" + video_id,

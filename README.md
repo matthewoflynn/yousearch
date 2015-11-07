@@ -17,3 +17,5 @@ You'll need the following server setup or similar:
     - PHP 5.3.15+
     
 
+To Fix:
+Handle search results that are channels - preferrably just avoid getting them in results
