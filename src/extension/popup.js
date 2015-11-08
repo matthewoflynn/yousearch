@@ -221,6 +221,7 @@ var popup = {
 	onVideoLookupQueryComplete: function(video_id, result) {
 		var video_tag = "video-id-" + video_id;
 		$("#" + video_tag + " .duration").html(result.duration);
+		$("#" + video_tag + " #views").html(result.views + " views");
 	},
 	
 	onOneVideoSearchCompleted: function(id) {
