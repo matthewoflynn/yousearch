@@ -16,6 +16,4 @@ You'll need the following server setup or similar:
     - Apache 2.2.22+
     - PHP 5.3.15+
     
-
-To Fix:
-Handle search results that are channels - preferrably just avoid getting them in results
+    
