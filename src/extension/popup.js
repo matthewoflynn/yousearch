@@ -217,6 +217,11 @@ var popup = {
 		
 		}
 	},
+
+	onVideoLookupQueryComplete: function(video_id, result) {
+		var video_tag = "video-id-" + video_id;
+		$("#" + video_tag + " .duration").html(result.duration);
+	},
 	
 	onOneVideoSearchCompleted: function(id) {
 		
@@ -280,20 +285,18 @@ var popup = {
 		$table.append($tbody);
 		$('#results').append($table);
 		
-		var id = 0;
-		
 		for (var key in results.entries) {
+			
 			var result = results.entries[key];
-			var result_id = 'result-number-' + id;
-			id++;
-			var html = '<tr id="' + result_id + '">';
+			var video_id_tag = 'video-id-' + result.id;
+			var html = '<tr id="' + video_id_tag + '">';
 			
 			html = html + '<td class="thumbnail">'
 			 				+ '<div class="thumbnail-holder">'
 								+ '<a>'
 									+ '<img class="thumbnail" src="' + result.thumb_url + '"/>' 
 									+ '<img class="play" src="img/Play Transparent.png"/>'
-									+ '<div class="duration">' + result.duration + '</div>'
+									+ '<div class="duration">...</div>'
 								+ '</a>'
 							+ '</div>'
 					  	+ '</td>';
@@ -302,8 +305,8 @@ var popup = {
 							+ '<a class="title" href="#">' 
 								+ result.title 
 							+ '</a><br/>'
-							+ '<span>'
-								+ result.views + ' views'
+							+ '<span id="views">'
+								+ '...'
 							+ '</span>'
 						+ '</td>';
 			
@@ -311,15 +314,13 @@ var popup = {
 			
 			$tbody.append(html);
 			
-			
-			
-			$('#'+result_id).mouseover(function() {
+			$('#'+video_id_tag).mouseover(function() {
 				popup.highlightRow(this)
 			});
-			$('#'+result_id).mouseout(function() {
+			$('#'+video_id_tag).mouseout(function() {
 				popup.unHighlightRow(this)
 			});
-			$('#'+result_id).click(function() {
+			$('#'+video_id_tag).click(function() {
 				var result_link = result.link_url;
 				
 				return function() {
@@ -330,11 +331,17 @@ var popup = {
 				// single-origin-policy. Need to check if I can get around this.
 				//popup.playVideo(result.content_url);
 			}());
-			
-	
-			
+
+			popup.queryYoutubeForFurtherInfomation(result.id);			
 		}
 		
+	},
+
+	queryYoutubeForFurtherInfomation: function(video_id) {
+		var video_lookup = new YoutubeVideoLookupQuery();
+
+		video_lookup.setResponseHandler(popup.onVideoLookupQueryComplete);
+		video_lookup.executeQuery(video_id);
 	},
 	
 	showResultsNav: function(results) {

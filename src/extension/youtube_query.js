@@ -197,7 +197,7 @@ function YoutubeVideoLookupQuery() {
 			console.log("something went wrong - no results.")
 		
 		} else {
-			var formattedDuration = _convertDurationFromISO8601FormatToString(
+			var formattedDuration = VideoUnitConverter.durationFromISO8601ToString(
 				entry[0].contentDetails.duration
 			); 
 
@@ -211,22 +211,71 @@ function YoutubeVideoLookupQuery() {
 		return result;
 	};
 
-	var _convertDurationFromISO8601FormatToString = function(iso8601Duration) {
+}
+
+var VideoUnitConverter = {
+	durationFromISO8601ToString : function(iso8601Duration) {
+		// Unit tests for this exist under /tests
 		// e.g. "iso8601Duration": "PT15M51S"
 		//      15:51 (15 minutes, 51 seconds)
+		// for more see https://en.wikipedia.org/wiki/ISO_8601#Durations.
 
 		var iso = iso8601Duration;
-		var minutes = iso.substring(iso.indexOf("T")+1, iso.indexOf("M"));
-		var seconds = iso.substring(iso.indexOf("M")+1, iso.indexOf("S"));
 
-		if (minutes.length == 1) { 
-			minutes = "0" + minutes;
+		var hours_included = iso.indexOf("H") > -1;
+		var minutes_included = iso.indexOf("M") > -1;
+		var seconds_included = iso.indexOf("S") > -1;
+
+		var return_value = "";
+
+		if (hours_included) {
+			return_value += VideoUnitConverter._padTimeWithZeros(
+				iso.substring(iso.indexOf("T")+1, iso.indexOf("H"))
+			);			
 		};
 
-		if (seconds.length == 1) { 
-			seconds = "0" + seconds;
-		};
-		return minutes + ":" + seconds;
+		if (hours_included && minutes_included) {
+			return_value += ":";
+			return_value += VideoUnitConverter._padTimeWithZeros(
+				iso.substring(iso.indexOf("H")+1, iso.indexOf("M"))
+			);
+		} else if (minutes_included) {
+			return_value += VideoUnitConverter._padTimeWithZeros(
+				iso.substring(iso.indexOf("T")+1, iso.indexOf("M"))
+			);
+		} else if (hours_included) {
+			return_value += ":00";
+		} else {
+			return_value += "00";
+		}
+
+		return_value += ":";
+
+		if (minutes_included && seconds_included) {
+			return_value += VideoUnitConverter._padTimeWithZeros(
+				iso.substring(iso.indexOf("M")+1, iso.indexOf("S"))
+			);
+		} else if (hours_included && seconds_included) {
+			return_value += VideoUnitConverter._padTimeWithZeros(
+				iso.substring(iso.indexOf("H")+1, iso.indexOf("S"))
+			);
+		} else if (seconds_included) {
+			return_value += VideoUnitConverter._padTimeWithZeros(
+				iso.substring(iso.indexOf("T")+1, iso.indexOf("S"))
+			);
+		} else {
+			return_value += "00";
+		}
+		
+		return return_value;
+	},
+
+	
+	/** Private Methods *****************************************************/
+	_padTimeWithZeros : function(time) {
+		if (time.length == 1) {
+			return "0" + time;
+		} 
+		return time;
 	}
-
 }
