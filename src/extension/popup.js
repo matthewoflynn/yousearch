@@ -58,7 +58,8 @@ function VideoSearchResultsBox(id, query_string, results_per_page, searchComplet
 				 + '</tr>';
 		
 		$('#results').append(html);
-		$('#results').show();
+		$('#results-wrapper').show();
+		console.log("results-wrapper show (showSearchBox)");
 		
 	};
 	
@@ -104,33 +105,6 @@ function VideoSearchResultsBox(id, query_string, results_per_page, searchComplet
 			}
 		);
 		
-		
-		
-		/*
-		
-		
-		var result = results.entries['0'];
-		var html = "";
-		html = html + '<td class="thumbnail">'
-		 				+ '<div class="thumbnail-holder">'
-							+ '<a>'
-								+ '<img class="thumbnail" src="' + result.thumb_url + '"/>' 
-								+ '<img class="play" src="img/Play Transparent.png"/>'
-							+ '</a>'
-							+ '<div class="duration">' + result.duration + '</div>'
-						+ '</div>'
-				  	+ '</td>';
-		html = html + '<td>'
-						+ '<a class="title" href="#" onclick="popup.openTab(\'' + result.link_url + '\')">' 
-							+ result.title 
-						+ '</a><br/>'
-						+ '<span>'
-							+ result.views + ' views'
-						+ '</span>'
-					+ '</td>';
-		search_box.append(html);
-		*/
-					
 	};
 	
 }
@@ -149,17 +123,33 @@ var popup = {
 	
 		popup.setBackgroundPageListener();
 		
-		$("#close-button").click(popup.close);
+		$("#clear-button").click(popup.clear_searchbox);
 		$('#search-box').submit(function() {
 			popup.searchbarSearch();
 			return false;
 		}); 
+		$("#welcome a").click(popup.show_instructions);
+		
 	},
 	
 	setBackgroundPageListener: function(){
 		var bg = chrome.extension.getBackgroundPage();
 		bg.getPageInfo(popup.onSelectedTextReceived);
 		
+	},
+
+	show_instructions: function() {
+		$("#instructions").show();
+
+		$("#welcome a").html("Hide Instructions");
+		$("#welcome a").click(popup.hide_instructions);
+	},
+
+	hide_instructions: function() {
+		$("#instructions").hide();
+		$("#welcome a").html("Show Instructions");
+		$("#welcome a").click(popup.show_instructions);
+
 	},
 
 	/** Callback Methods ****************************************************/
@@ -191,10 +181,13 @@ var popup = {
 			
 			popup.showSearchesRemaining();	
 			
-		} else {
+		} else if (selectedQuery.length > 0) {
 			popup.startNewYoutubeSearch(selectedQuery);
-			
+		} else {
+			// button clicked without text selected.
+			console.log("button clicked without text selected.");
 		}
+
 		
 		
 	},
@@ -206,9 +199,12 @@ var popup = {
 			
 			popup.showResultsNav(results);
 			
+			$("#welcome").hide();
+			$("#instructions").hide();
 			$("#loading").hide();
 			popup.appendSearchResults(results)
-			$("#results").show();
+			$("#results-wrapper").show();
+			console.log("results-wrapper show (onYoutubeSearchComplete)");
 			
 		} else {
 			console.log("old results being ignored");
@@ -260,6 +256,8 @@ var popup = {
 								   popup.searchResultsStartIndex,
 						   		   popup.options.getValueAsInt('searchResultsPerPage'));
 	},
+
+
 	
 	/** View Methods ********************************************************/	
 	highlightRow: function(row) {
@@ -528,6 +526,7 @@ var popup = {
 					+ '</object>';
 		
 		$("#results-wrapper").hide();
+		console.log("results-wrapper hide (playVideo)");
 		$("#player").append(html);
 		$("#player").show();
 	},
@@ -542,8 +541,11 @@ var popup = {
 		popup.searchYoutube(popup.mostRecentSearchQuery);
 	},
 	
-	close: function() {
-		window.close();
+	clear_searchbox: function() {
+		$("#search-box input").val('');
+		$("#results-wrapper").hide();
+		$("#welcome").show();
+		popup.hide_instructions();
 	}
 }
 

@@ -48,13 +48,46 @@ h1 {
 }
 
 
+/** Instructions ********************************************************/
+#welcome {
+	float: left;
+	width: 100%;
+	text-align: center;
+}
+
+#instructions {
+	display: none;
+	float: left;
+}
+
+#instructions .instruction {
+	float: left;
+    margin: 5px 5px 0px 5px;
+    border: #E4E4E4 solid thin;
+    padding: 5px;
+    background-color: #F9F9F9;
+} 
+
+#instructions h1 {
+	float: left;
+    width: 30px;
+    padding-left: 10px;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+#instructions img {
+	float: left;
+}
+
 /** Search Results ******************************************************/
 #loading {
+	display: none;
 	text-align: center;
 }
 
 #results-wrapper {
-	display: block;
+	display: none;
 	height: 460px;
 	width: 100%;
 	
@@ -176,12 +209,32 @@ table {
 <div id="search-bar">
 	<img src='img/YouSearch-Horizontal-25.png' alt="YouSearch"/>
 	<form id="search-box">
-		<input type='text' value='loading...' name='search-text'/>
+		<input type='text' value='' name='search-text'/>
 	</form>
-	<a href="#" id="close-button">
+	<a href="#" id="clear-button">
 		<img class="button" src='img/SweetiePlus/without-shadows/cross-24-ns.png' 
-			 alt="Close YouSearch"/>
+			 alt="Clear Search Box"/>
 	</a>
+</div>
+
+<div id="welcome">
+<p>Search YouTube using the search bar or selected text.</p>
+<a href="#">Show Instructions</a>
+</div>
+
+<div id="instructions">
+	<div class="instruction">
+		<h1>1</h1>
+		<img src="img/instructions/OnePhraseSearch 1. Select Text.png"/>
+	</div>
+	<div class="instruction">
+		<h1>2</h1>
+		<img src="img/instructions/OnePhraseSearch 2. Click Button.png"/>
+	</div>
+	<div class="instruction">
+		<h1>3</h1>
+		<img src="img/instructions/OnePhraseSearch 3. View Results.png"/>
+	</div>
 </div>
 
 <div id="loading">
@@ -189,7 +242,7 @@ table {
 </div>
 
 <div id="results-wrapper">
-	<table summary="" id="results" style="display: none;"></table>
+	<table summary="" id="results"></table>
 </div>
 
 <div id="player"></div>
