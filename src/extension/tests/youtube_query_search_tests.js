@@ -14,7 +14,7 @@ QUnit.test( "Search results are valid", function( assert ) {
         done();
     });
 
-    query.executeQuery("query", 1, 5);
+    query.executeQuery("query");
 });
 
 QUnit.test("Query can yield no results", function( assert ) {
@@ -29,7 +29,7 @@ QUnit.test("Query can yield no results", function( assert ) {
         done();
     });
     
-    query.executeQuery("asdfkjweacsdkl", 1, 5);
+    query.executeQuery("asdfkjweacsdkl");
 });
 
 
@@ -45,7 +45,7 @@ QUnit.test("Blank query yields no results", function( assert ) {
         done();
     });
     
-    query.executeQuery("", 1, 5);
+    query.executeQuery("");
 });
 
 
@@ -66,8 +66,58 @@ QUnit.test("Ensure only videos are retrieved", function( assert ) {
         done();
     });
 
-    query.executeQuery("School of Life", 1, 5);
+    query.executeQuery("School of Life");
 });
 
+QUnit.test("Ensure First Page of Results Includes Next Page Token", function( assert ) {
+    assert.expect(1);
+    var done = assert.async();
 
+    var query = new YoutubeSearchQuery();
+
+    query.setResponseHandler( function(search_query, results) {
+        // ensure that the video URL is valid and does not contain "undefined"
+        assert.notEqual(results.next_page_token, undefined);
+        done();
+    });
+
+    query.executeQuery("School of Life");
+});
+
+QUnit.test("Ensure Second Page of Results includes Previous and Next Tokens", function( assert ) {
+    assert.expect(2);
+    var done = assert.async();
+
+    var first_query = new YoutubeSearchQuery();
+
+    first_query.setResponseHandler( function(search_query, first_results) {
+        var second_query = new YoutubeSearchQuery();
+
+        second_query.setResponseHandler( function(search_query, second_results) {
+            // ensure that the video URL is valid and does not contain "undefined"
+            assert.notEqual(second_results.next_page_token, undefined);
+            assert.notEqual(second_results.prev_page_token, undefined);
+            done();
+        });
+
+        second_query.executeQuery("School of Life", first_results.next_page_token);
+    });
+
+    first_query.executeQuery("School of Life");
+});
+
+QUnit.test("Ensure Search for Blank String has no page tokens", function( assert ) {
+    assert.expect(2);
+    var done = assert.async();
+
+    var query = new YoutubeSearchQuery();
+
+    query.setResponseHandler( function(search_query, first_results) {
+        assert.equal(first_results.next_page_token, undefined);
+        assert.equal(first_results.prev_page_token, undefined);
+        done();
+    });
+
+    query.executeQuery("");
+});
 

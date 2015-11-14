@@ -8,11 +8,12 @@
 search_service = new YoutubeSearchService();
 
 search_service.setResponseHandler( response_handler );
-search_service.executeQuery( search_string, results_per_page, startIndex );
+search_service.executeQuery( search_string, page_token );
 
 function responseHandler(results) {
 	var original_query = results.search_query;
-	var results_count = results.count;
+	var next_page_token = results.next_page_token; // May not exist
+	var prev_page_token = results.prev_page_token; // May not exist
 	
 	for (entry in results.entries) {
 		entry.content_url;
@@ -35,7 +36,11 @@ function YoutubeSearchQuery() {
 		_response_handler = response_handler;
 	};
 	
-	this.executeQuery = function(search_string, start_index, results_per_page) {
+	/*
+	 * page_token can be the next page token or the previous.
+	 * if none provided, the first results page will be retrieved.
+	 */
+	this.executeQuery = function(search_string, page_token) {
 		_search_string = search_string;
 
 		if (search_string === "") {
@@ -44,16 +49,20 @@ function YoutubeSearchQuery() {
 		}
 
 		var youtube = {
-			BaseApiQuery : "https://www.googleapis.com/youtube/v3",
-			ApiQuery : "/search?q=" + _search_string,
-			DeveloperKey :"key=AIzaSyBYPUJZlP-QaxWaE79zEMZBvCKenWlNQws",
-			ApiPart : "part=snippet&type=video"
+			base_api_query : "https://www.googleapis.com/youtube/v3",
+			api_query : "/search?q=" + _search_string,
+			developer_key :"key=AIzaSyBYPUJZlP-QaxWaE79zEMZBvCKenWlNQws",
+			api_part : "part=snippet&type=video"
 		};
 
-		var fullYoutubeQuery = youtube.BaseApiQuery + 
-							   	youtube.ApiQuery  + "&" +
-								youtube.DeveloperKey  + "&" +
-								youtube.ApiPart;
+		if (typeof(page_token) != "undefined") {
+			youtube.api_part += "&pageToken=" + page_token;
+		};
+
+		var fullYoutubeQuery = youtube.base_api_query + 
+							   	youtube.api_query  + "&" +
+								youtube.developer_key  + "&" +
+								youtube.api_part;
 
 		
 		sendRequest(fullYoutubeQuery);
@@ -97,9 +106,10 @@ function YoutubeSearchQuery() {
 		
 		var results = {};
 		results.total_results = data.pageInfo.totalResults;
+		results.next_page_token = data.nextPageToken;
+		results.prev_page_token = data.prevPageToken;
 		results.entries = [];
 		
-		// loop through search results
 		var entries = data.items || [];
 		
 		for (var i = 0; i < entries.length; ++i) {
@@ -107,19 +117,12 @@ function YoutubeSearchQuery() {
 			var video_id = entry.id.videoId;
 			var result = {};
 			result = {
-						id:				video_id,
-						title: 			entry.snippet.title.substring(0, 42),
-						views:			5,
-						duration: 		5,
-						link_url: 		"https://www.youtube.com/watch?v=" + video_id,
-						thumb_url:		entry.snippet.thumbnails.default.url,
-						content_url: 	"http://www.google.com"
-					  };
-			
-			var mins = Math.floor(result.duration / 60);
-			var secs = (result.duration % 60).toFixed();
-			if (secs < 10) secs = "0" + secs;
-			result.duration = mins + ":" + secs;
+				id:				video_id,
+				title: 			entry.snippet.title.substring(0, 42),
+				link_url: 		"https://www.youtube.com/watch?v=" + video_id,
+				thumb_url:		entry.snippet.thumbnails.default.url,
+				content_url: 	"http://www.google.com"
+			};
 			
 			results.entries.push(result);			
 		}
@@ -142,16 +145,16 @@ function YoutubeVideoLookupQuery() {
 		_video_id = video_id;
 
 		var youtube = {
-			BaseApiQuery : "https://www.googleapis.com/youtube/v3",
-			ApiQuery : "/videos?id=" + _video_id,
-			DeveloperKey :"key=AIzaSyBYPUJZlP-QaxWaE79zEMZBvCKenWlNQws",
-			ApiPart : "part=contentDetails,statistics"
+			base_api_query : "https://www.googleapis.com/youtube/v3",
+			api_query : "/videos?id=" + _video_id,
+			developer_key :"key=AIzaSyBYPUJZlP-QaxWaE79zEMZBvCKenWlNQws",
+			api_part : "part=contentDetails,statistics"
 		};
 
-		var fullYoutubeQuery = youtube.BaseApiQuery + 
-							   	youtube.ApiQuery  + "&" +
-								youtube.DeveloperKey  + "&" +
-								youtube.ApiPart;
+		var fullYoutubeQuery = youtube.base_api_query + 
+							   	youtube.api_query  + "&" +
+								youtube.developer_key  + "&" +
+								youtube.api_part;
 
 		// var result = [];
 		// _response_handler(_video_id, result);

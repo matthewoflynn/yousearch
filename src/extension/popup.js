@@ -59,7 +59,6 @@ function VideoSearchResultsBox(id, query_string, results_per_page, searchComplet
 		
 		$('#results').append(html);
 		$('#results-wrapper').show();
-		console.log("results-wrapper show (showSearchBox)");
 		
 	};
 	
@@ -173,23 +172,19 @@ var popup = {
 					
 					popup.search_results[result_index] = new VideoSearchResultsBox(i, search_strings[i], 1,
 															popup.onOneVideoSearchCompleted);
-					popup.search_results[result_index].executeQuery(1);
-				
+					popup.search_results[result_index].executeQuery(1);				
 					popup.search_results_remaining++;	
 				}
 			}
 			
 			popup.showSearchesRemaining();	
-			
+
 		} else if (selectedQuery.length > 0) {
 			popup.startNewYoutubeSearch(selectedQuery);
 		} else {
 			// button clicked without text selected.
 			console.log("button clicked without text selected.");
 		}
-
-		
-		
 	},
 
 	onYoutubeSearchComplete: function(search_query, results) {
@@ -197,19 +192,17 @@ var popup = {
 		// ensure that only the results of the most recent search are displayed
 		if (search_query == popup.mostRecentSearchQuery) {
 			
-			popup.showResultsNav(results);
 			
 			$("#welcome").hide();
 			$("#instructions").hide();
 			$("#loading").hide();
 			popup.appendSearchResults(results)
 			$("#results-wrapper").show();
-			console.log("results-wrapper show (onYoutubeSearchComplete)");
+			popup.showResultsNav(results);
 			
 		} else {
 			console.log("old results being ignored");
 			console.log("results.search_query = " + search_query);
-			console.log("popup.mostRecentSearchQuery = " + popup.mostRecentSearchQuery);
 		
 		}
 	},
@@ -243,18 +236,16 @@ var popup = {
 	startNewYoutubeSearch: function(query) {
 		popup.searchResultsStartIndex = 1;
 		popup.searchYoutube(query);
-		
 	},
 	
-	searchYoutube: function(query) {
+	searchYoutube: function(query, page_token) {
 		popup.mostRecentSearchQuery = query;
-		
+
+		popup.hide_instructions();
 		popup.clearResultsAndPlayer();
 		$("#loading").show();
 		
-		popup.youtube.executeQuery(query, 
-								   popup.searchResultsStartIndex,
-						   		   popup.options.getValueAsInt('searchResultsPerPage'));
+		popup.youtube.executeQuery(query, page_token);
 	},
 
 
@@ -271,6 +262,7 @@ var popup = {
 	},
 	
 	clearResultsAndPlayer: function() {
+		$("#results-wrapper").hide();
 		$('#results').empty();
 		$('#player').empty();
 	},
@@ -326,9 +318,6 @@ var popup = {
 					popup.openTab(result_link);
 				};
 				
-				// Note: Can't play videos in the popup itself due to new security
-				// single-origin-policy. Need to check if I can get around this.
-				//popup.playVideo(result.content_url);
 			}());
 
 			popup.queryYoutubeForFurtherInfomation(result.id);			
@@ -347,39 +336,40 @@ var popup = {
 		var linkToPreviousResults = "";
 		var linkToNextResults = "";
 		
-		var numberOfResultOnPage = results.entries.length;
-		var numberOfLastResultOnPage = popup.searchResultsStartIndex + numberOfResultOnPage - 1;
-		
 		var goToPreviousPageId = 'go-to-previous-page';
 		var goToNextPageId = 'go-to-next-page';
 		
-		if (popup.searchResultsStartIndex > 1) {
-			linkToPreviousResults = '<a id="' + goToPreviousPageId + '" href="#">'
+		if (typeof(results.prev_page_token) != "undefined") {
+			popup.prev_page_token = results.prev_page_token;
+			linkToPreviousResults = '<a id="' + goToPreviousPageId + '" class="prev_page" href="#">'
 									+ '<img src="img/SweetiePlus/without-shadows/arrow-left-24-ns.png"/>'
 								 + '</a>';
 			
+		} else {
+			popup.prev_page_token = undefined;
 		}
 	
 		
-		if (numberOfLastResultOnPage < results.total_results) {
-			linkToNextResults = '<a id="' + goToNextPageId + '" href="#">'
+		if (typeof(results.next_page_token) != "undefined") {
+			popup.next_page_token = results.next_page_token;
+			linkToNextResults = '<a id="' + goToNextPageId + '" class="next_page" href="#">'
 				   					+ '<img src="img/SweetiePlus/without-shadows/arrow-right-24-ns.png"/>'
 				   			  + '</a>';
 				   			  
+		} else {
+			popup.next_page_token = undefined;
 		}
 	
 		var html = "<div id='results-nav'>"
 						+ linkToPreviousResults + " "
-				   		+ (popup.searchResultsStartIndex) + " - " 
-				   		+ (numberOfLastResultOnPage) + " "
 				   		+ linkToNextResults
 				   		+ "<br/>"
-				   		+ "<div>of " + results.total_results + " results</div>"
 				   	+ "</div>";
 		
 		var playlist_control_bar = $('#results-control-bar');
 		playlist_control_bar.empty();
 		playlist_control_bar.append(html);
+		playlist_control_bar.show();
 		
 		$('#'+goToPreviousPageId).click(popup.goToPreviousResultsPage);
 		$('#'+goToNextPageId).click(popup.goToNextResultsPage);
@@ -516,34 +506,18 @@ var popup = {
 		window.close();
 	},
 	
-	playVideo: function(content_url) {	
-		
-		var html =  '<object>' 
-						+ '<param name="movie" value="' + content_url + '"></param>'
-						+ '<embed src="' + content_url + '" '
-							+ 'type="application/x-shockwave-flash" width="480" height="295">'
-						+ '</embed>'
-					+ '</object>';
-		
-		$("#results-wrapper").hide();
-		console.log("results-wrapper hide (playVideo)");
-		$("#player").append(html);
-		$("#player").show();
-	},
-	
 	goToNextResultsPage: function() {
-		popup.searchResultsStartIndex += popup.searchResultsPerPage;
-		popup.searchYoutube(popup.mostRecentSearchQuery);
+		popup.searchYoutube(popup.mostRecentSearchQuery, popup.next_page_token);
 	},
 	
 	goToPreviousResultsPage: function() {
-		popup.searchResultsStartIndex -= popup.searchResultsPerPage;
-		popup.searchYoutube(popup.mostRecentSearchQuery);
+		popup.searchYoutube(popup.mostRecentSearchQuery, popup.prev_page_token);
 	},
 	
 	clear_searchbox: function() {
 		$("#search-box input").val('');
 		$("#results-wrapper").hide();
+		$("#results-control-bar").hide();
 		$("#welcome").show();
 		popup.hide_instructions();
 	}
