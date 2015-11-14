@@ -1,9 +1,17 @@
 {
-	"name": "You Search",
-	"version": "0.4",
-	"description": "Create youtube playlists from highlighted text",
 	"manifest_version": 2,
-	"icons": {"128": "img/YouSearch128.png"},
+	"name": "You Search",
+	"short_name": "You Search",
+	"version": "0.4",
+
+	"description": "Search YouTube using selected text.",
+	"icons": {
+		"128": "img/YouSearch128.png"
+	},
+
+
+	
+	"author" : "Matthew O'Flynn",
 	"permissions": [
 		"tabs",
 		"http://*/*",
