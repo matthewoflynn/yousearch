@@ -113,6 +113,7 @@ var popup = {
 
 	/** Initialisation ******************************************************/
 	init: function() {
+		popup.initEventTracking();
 		popup.options = chrome.extension.getBackgroundPage().options;
 		popup.searchResultsStartIndex = 0;
 		popup.searchResultsPerPage = popup.options.getValueAsInt('searchResultsPerPage');
@@ -127,35 +128,47 @@ var popup = {
 			popup.searchbarSearch();
 			return false;
 		}); 
-		$("#welcome a").click(popup.show_instructions);
+		$("#welcome a").click(popup.showInstructions);
+		$("#welcome a").click(popup.trackShowInstructions);
+
+		$( window ).unload(popup.handleUnload);
 		
 	},
 	
 	setBackgroundPageListener: function(){
 		var bg = chrome.extension.getBackgroundPage();
-		bg.getPageInfo(popup.onSelectedTextReceived);
+		bg.setSearchTextCallback(popup.onSelectedTextReceived);
 		
 	},
 
-	show_instructions: function() {
+	showInstructions: function() {
 		$("#instructions").show();
-
 		$("#welcome a").html("Hide Instructions");
-		$("#welcome a").click(popup.hide_instructions);
+		$("#welcome a").unbind();
+		$("#welcome a").click(popup.hideInstructions);
+		$("#welcome a").click(popup.trackHideInstructions);
 	},
 
-	hide_instructions: function() {
+	hideInstructions: function() {
 		$("#instructions").hide();
 		$("#welcome a").html("Show Instructions");
-		$("#welcome a").click(popup.show_instructions);
+		$("#welcome a").unbind();
+		$("#welcome a").click(popup.showInstructions);
+		$("#welcome a").click(popup.trackShowInstructions);
 
+	},
+
+	handleUnload: function() {
+		popup.publishEvents();
 	},
 
 	/** Callback Methods ****************************************************/
-	onSelectedTextReceived: function(selectedQuery) {
+	onSelectedTextReceived: function(selectedQuery, currentWebLocation) {
+		popup.addTrackingEvent("onSelectedTextReceived query=\"" + selectedQuery + "\"");
+
 		$('input[name|="search-text"]').attr("value", selectedQuery);
 		
-		search_strings = selectedQuery.split('\n');
+		var search_strings = selectedQuery.split('\n');
 		var multiple_lines_in_string = search_strings.length > 1; 
 		
 		if (multiple_lines_in_string) {
@@ -191,8 +204,6 @@ var popup = {
 		
 		// ensure that only the results of the most recent search are displayed
 		if (search_query == popup.mostRecentSearchQuery) {
-			
-			
 			$("#welcome").hide();
 			$("#instructions").hide();
 			$("#loading").hide();
@@ -230,6 +241,8 @@ var popup = {
 	/** Control Methods *****************************************************/	
 	searchbarSearch: function() {
 		var query = $('#search-bar input').attr('value');
+		popup.addTrackingEvent("searchbarSearch \"" + query + "\"");
+
 		popup.startNewYoutubeSearch(query);
 	},
 	
@@ -241,7 +254,7 @@ var popup = {
 	searchYoutube: function(query, page_token) {
 		popup.mostRecentSearchQuery = query;
 
-		popup.hide_instructions();
+		popup.hideInstructions();
 		popup.clearResultsAndPlayer();
 		$("#loading").show();
 		
@@ -312,9 +325,9 @@ var popup = {
 				popup.unHighlightRow(this)
 			});
 			$('#'+video_id_tag).click(function() {
-				var result_link = result.link_url;
-				
+				var result_link = result.link_url;				
 				return function() {
+					popup.addTrackingEvent("openedYoutube url=\"" + encodeURIComponent(result_link) + "\"");
 					popup.openTab(result_link);
 				};
 				
@@ -515,15 +528,51 @@ var popup = {
 	},
 	
 	clear_searchbox: function() {
+		popup.addTrackingEvent("clear_searchbox");
+
 		$("#search-box input").val('');
 		$("#results-wrapper").hide();
 		$("#results-control-bar").hide();
 		$("#welcome").show();
-		popup.hide_instructions();
+		popup.hideInstructions();
+	},
+
+
+
+	
+	/** Event Tracking Methods **********************************************/
+	initEventTracking: function() {
+		popup.event_tracker = "Event Tracking. ";
+
+		chrome.tabs.getSelected(null, function(tab) {
+			popup.addTrackingEvent("URL=\"" + encodeURIComponent(tab.url) + "\"");
+		});
+	}, 
+
+	addTrackingEvent: function(event_text) {
+		popup.event_tracker += "[" + event_text + "]";
+	},
+
+	publishEvents: function() {
+		xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "http://analytics.matt.ie", false);
+		xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhttp.send("event=" + popup.event_tracker);
+	},
+
+	trackShowInstructions: function() {
+		popup.addTrackingEvent("showInstructions");
+	},
+
+	trackHideInstructions: function() {
+		popup.addTrackingEvent("hideInstructions");
 	}
+
 }
 
 $(document).ready( function() {
 	popup.init();
 	
 } );
+
+

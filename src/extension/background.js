@@ -62,7 +62,7 @@ var options = {
 // Array to hold callback functions
 var g_callback;
 
-function getPageInfo(callback) {
+function setSearchTextCallback(callback) {
 	console.log("getPageInfo");
 	g_callback = callback;
 	
