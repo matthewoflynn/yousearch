@@ -542,7 +542,7 @@ var popup = {
 	
 	/** Event Tracking Methods **********************************************/
 	initEventTracking: function() {
-		popup.event_tracker = "Event Tracking. ";
+		popup.event_tracker = "Development Event Tracking. ";
 
 		chrome.tabs.getSelected(null, function(tab) {
 			popup.addTrackingEvent("URL=\"" + encodeURIComponent(tab.url) + "\"");
@@ -572,7 +572,6 @@ var popup = {
 
 $(document).ready( function() {
 	popup.init();
-	
 } );
 
 

@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "You Search",
 	"short_name": "You Search",
-	"version": "0.5",
+	"version": "0.6",
 
 	"description": "Search YouTube using selected text.",
 	"icons": {
