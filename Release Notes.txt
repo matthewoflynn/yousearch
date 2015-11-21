@@ -2,18 +2,17 @@ Search Youtube using highlighted text.
 
 All feedback welcome! Please review if you like it or give me feedback if something doesn't work. 
 
-Features:
+Feature:
 *** Single Item Highlighted Search
 Highlight the search term on the webpage and click the YouSearch icon. The results will be presented in the pop-up.
 
-<snip>
-*** YouTube Playlist Creation
-1. Highlight some text with multiple lines, e.g. a list of songs and click the YouSearch icon. YouSearch will search YouTube for each line of text individually and present the first result of each search in the pop-up. 
-2. Click "Create Playlist" at the bottom of the pop-up. You must be logged into YouTube and allow YouSearch to access your YouTube account.
-</snip>
-
-
 --------------------------------------------------------------
+v0.6 
+- Improved analytics
+
+v0.5
+- Adding improved user analytics - so I as the developer can understand better how you guys are using this extension!
+
 v0.4
 - Fixing up this extension, previously everything was broken. Now only searching selected text works. I am working on getting playlists to work for one of the next versions.
 
