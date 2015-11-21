@@ -1,19 +1,21 @@
 YouSearch
 =========
 
-Chrome extension for searching Youtube and automatically generating Youtube playlists
+Chrome extension for searching Youtube. In future, it is intended that it can automatically generate Youtube playlists based on a list of search terms. 
 
 Running Extension Locally
 -------------------------
-    1. On the Chrome extensions page (Tools > Extensions) there is a "Developer mode" 
+    1. Clone this repo locally.
+    2. On the Chrome extensions page (chrome://extensions) there is a "Developer mode" 
        checkbox. Check it. 
-    2. Click the "Load unpacked extension..."
-    3. Select the
+    3. Click "Load unpacked extension..." 
+    4. Select the /extension/root folder under the clone.
+    5. The YouSearch Extension should appear in the top-right of Chrome.
     
-Running PHP Server Locally
---------------------------
-You'll need the following server setup or similar:
-    - Apache 2.2.22+
-    - PHP 5.3.15+
-    
-    
+Releasing A New Version
+-----------------------
+    1. Open the /extension/build folder
+    2. Using a bash shell, run ./package.sh
+    3. All going well, the package will be made ready for release.
+       Read the script output to see location of the zip.
+    4. Publish the app via http://chrome.google.com/webstore/developer
