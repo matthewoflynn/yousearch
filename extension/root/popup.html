@@ -46,6 +46,30 @@ h1 {
 }
 
 
+/** Error Message *******************************************************/
+#error-message {
+	float: left;
+	display: none;
+	min-width: 480px;
+	height: 37px;
+	border: 2px solid red;
+	color: red;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: center;
+}
+
+#error-message span {
+	width: 440px;
+	float: left;
+	padding-top: 5px;
+}
+
+#error-message img {
+	float: right;
+}
+
+
 /** Instructions ********************************************************/
 #welcome {
 	float: left;
@@ -226,6 +250,18 @@ table {
 	<a href="#" id="clear-button">
 		<img class="button" src='img/SweetiePlus/without-shadows/cross-24-ns.png' 
 			 alt="Clear Search Box"/>
+	</a>
+</div>
+
+<div id="error-message">
+	<span>
+		Sorry, selecting text isn't allowed on this page.
+		<br/>
+		Please use the search bar above instead.
+	</span>
+	<a href="#">
+		<img class="button" src='img/SweetiePlus/without-shadows/cross-24-ns.png' 
+			 alt="Clear Error Box"/>
 	</a>
 </div>
 

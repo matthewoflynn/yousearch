@@ -59,19 +59,47 @@ var options = {
 };
 
 
-// Array to hold callback functions
-var g_callback;
+// callback functions
+var g_searchTextCallback;
+var g_contextScriptInjectionStatusCallback;
 
-function setSearchTextCallback(callback) {
+function setSearchTextCallback(search_text_callback, context_script_injection_status_callback) {
 	console.log("getPageInfo");
-	g_callback = callback;
+	g_searchTextCallback = search_text_callback;
+	g_contextScriptInjectionStatusCallback = context_script_injection_status_callback;
 	
-	chrome.tabs.executeScript(null, {file: "context_script.js"});
+	chrome.tabs.executeScript(null, {file: "context_script.js"}, onContextScriptInjected); 
 };
 
+function onContextScriptInjected(array_of_result) {
+
+	var message = "";
+	var success = false;
+
+	// determine if script was successfully injected 
+	if (typeof array_of_result != 'undefined') {
+		success = true;
+		message = "script injection succeeded.";
+	} else {
+		var failure_message = "script injection failed. ";
+
+		if (typeof chrome.runtime.lastError != 'undefined' && 
+			typeof chrome.runtime.lastError.message != 'undefined') {
+
+			failure_message = "lastError = " + chrome.runtime.lastError.message;
+		} else {
+			failure_message = "error unknown";
+		};
+
+		success = false;
+		message = failure_message;
+	};
+
+	g_contextScriptInjectionStatusCallback(success, message);
+}
+
 chrome.extension.onRequest.addListener( function(request) {
-	console.log("onRequest listener");
-	console.log(g_callback);
+	console.log(g_searchTextCallback);
 	
-	g_callback(request);
+	g_searchTextCallback(request);
 });

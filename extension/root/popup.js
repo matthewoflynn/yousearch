@@ -114,6 +114,7 @@ var popup = {
 	/** Initialisation ******************************************************/
 	init: function() {
 		popup.initEventTracking();
+
 		popup.options = chrome.extension.getBackgroundPage().options;
 		popup.searchResultsStartIndex = 0;
 		popup.searchResultsPerPage = popup.options.getValueAsInt('searchResultsPerPage');
@@ -134,10 +135,10 @@ var popup = {
 		$( window ).unload(popup.handleUnload);
 		
 	},
-	
+
 	setBackgroundPageListener: function(){
 		var bg = chrome.extension.getBackgroundPage();
-		bg.setSearchTextCallback(popup.onSelectedTextReceived);
+		bg.setSearchTextCallback(popup.onSelectedTextReceived, popup.onContextScriptInjectionStatus);
 		
 	},
 
@@ -156,6 +157,16 @@ var popup = {
 		$("#welcome a").click(popup.showInstructions);
 		$("#welcome a").click(popup.trackShowInstructions);
 
+	},
+
+	showErrorMessage: function() {
+		$("#error-message").show();
+		$("#error-message a").click(popup.hideErrorMessage);
+	},
+
+	hideErrorMessage: function() {
+		popup.addTrackingEvent("error message cleared");
+		$("#error-message").hide();
 	},
 
 	handleUnload: function() {
@@ -198,6 +209,16 @@ var popup = {
 			// button clicked without text selected.
 			console.log("button clicked without text selected.");
 		}
+	},
+
+	onContextScriptInjectionStatus: function(success, message) {
+		if (success) {
+			popup.addTrackingEvent("script injected");
+		} else {
+			popup.addTrackingEvent("script injection failed, error=" + message);
+			popup.showErrorMessage();
+		};
+		
 	},
 
 	onYoutubeSearchComplete: function(search_query, results) {
@@ -536,8 +557,6 @@ var popup = {
 		$("#welcome").show();
 		popup.hideInstructions();
 	},
-
-
 
 	
 	/** Event Tracking Methods **********************************************/
